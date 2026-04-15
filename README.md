@@ -3,6 +3,20 @@
 Arduino Uno R4 Minima とリアルタイムな気象・環境リスクデータを同期させる、アンビエント・インジケーター・プロジェクト。
 JAPAN Sentinel のデータを、Windows PC (PowerShell) をブリッジとして物理的な「光の鼓動」に変えます。
 
+## 🌐 Data Source (Sentinel API)
+
+このプロジェクトは、以下の環境知能プラットフォームからリアルタイムにデータを取得しています。
+
+**JAPAN Sentinel | Environmental Intelligence**
+[https://wappa88jp.sakura.ne.jp/sentinel/](https://wappa88jp.sakura.ne.jp/sentinel/)
+
+### 🌀 連携の仕組み
+1.  **現在地の特定**: ブラウザ（Geolocation API）がユーザーの緯度・経度を特定し、サーバー側に送信します。
+2.  **環境リスクの計算**: サーバー側（`sentinel_server.py`）が、その地点の気象・大気汚染・防災情報を統合し、0〜100 の **「環境リスク指数 (risk_score)」** を算出。
+3.  **ブリッジ送信**: 本リポジトリの PowerShell スクリプトが、サーバー上の `sentinel_data.json` を 30秒ごとに取得し、Arduino にシリアル転送します。
+
+これにより、ネット接続のない Arduino Uno R4 Minima が、**「今、あなたがいる場所」の目に見えない環境リスク** を光の質感（呼吸や点滅）として物理的に映し出すことが可能になっています。
+
 ## 🌟 特徴
 - **リアルタイム連動**: ブラウザが判定した現在地の「気温」と「環境リスク指数」を 30秒ごとに取得。
 - **3段階アラートシステム**: 
