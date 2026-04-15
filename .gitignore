@@ -1,0 +1,14 @@
+# Arduino build artifacts
+BUILD/
+bin/
+*.exe
+*.zip
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Gemini CLI / Temporary files
+.gemini/
+.geminiignore
+plans/
