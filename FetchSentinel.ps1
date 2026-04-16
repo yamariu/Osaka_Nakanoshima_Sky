@@ -1,48 +1,38 @@
-# FetchSentinel.ps1
-# PC Bridge for Arduino Weather Indicator (Sentinel Edition)
-# Fetches environment data from JAPAN Sentinel and sends to COM3
+# FetchSentinel.ps1 (V10: Sticky Blue Bridge)
+# Sends real-time color and risk to Arduino.
 
 $portName = "COM3"
 $baudRate = 115200
-$apiUrl = "https://wappa88jp.sakura.ne.jp/sentinel/sentinel_data.json"
+$sentinelUrl = "https://wappa88jp.sakura.ne.jp/sentinel/sentinel_data.json"
 
-# Initialize Serial Port
 if ($port -ne $null) { $port.Close() }
 $port = New-Object System.IO.Ports.SerialPort $portName, $baudRate, None, 8, One
 $port.Open()
 
-Write-Host "Sentinel Bridge Started. Sending real-time risk data to $portName..."
+Write-Host "Sticky Blue Bridge Started." -ForegroundColor Cyan
 
 try {
     while ($true) {
-        Write-Host "Fetching Sentinel Data..."
+        Write-Host "`n--- Syncing ---"
         try {
-            # Disable caching for fresh data
-            $response = Invoke-RestMethod -Uri "$apiUrl?t=$(Get-Date -UFormat %s)"
+            $resp = Invoke-RestMethod -Uri $sentinelUrl
+            $risk = $resp.risk_score
             
-            $risk = $response.risk_score
-            $temp = $response.temp
-            $rain = $response.rain
-            $condition = "sentinel" # Special condition tag
-            
-            # Message Format: W:TEMP,CONDITION,RISK
-            # We use risk_score (0-100) to control blink speed
-            $msg = "W:$temp,$condition,$risk`n"
-            Write-Host "SENTINEL DATA -> Temp: $temp, Risk: $risk, Rain: $rain"
-            Write-Host "Sending: $msg"
-            
-            # Send to Arduino
+            # Base Color (Sunny Blue)
+            $r = 0; $g = 120; $b = 255
+            if ($resp.rain -gt 0) { $r = 0; $g = 0; $b = 180 }
+            elseif ($resp.weather -match "曇") { $r = 80; $g = 80; $b = 80 }
+
+            $msg = "$r,$g,$b,$risk`n"
+            Write-Host "SEND -> $msg" -ForegroundColor Green
             $port.Write($msg)
         }
         catch {
-            Write-Warning "Failed to fetch Sentinel data: $_"
+            Write-Warning "Update Failed: $_"
         }
-
-        # Update every 30 seconds for higher responsiveness
         Start-Sleep -Seconds 30
     }
 }
 finally {
     $port.Close()
-    Write-Host "Port closed."
 }
