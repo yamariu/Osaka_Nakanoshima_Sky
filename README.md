@@ -45,6 +45,3 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
 ### 3. 自動起動の設定
 1. `RunSyncSky.vbs` 内のパスが正しいことを確認します。
 2. `RunSyncSky.vbs` のショートカットを作成し、スタートアップフォルダ (`shell:startup`) に配置します。
-
----
-Produced by Gemini CLI.
